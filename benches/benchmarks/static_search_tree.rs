@@ -1,69 +1,65 @@
 use criterion::{black_box, criterion_group, Criterion};
 // use rand::{Rng, prelude::Distribution};
 // use rand::distributions::Uniform;
-use std::collections::BTreeMap;
 use cache_oblivious_b_tree::BTreeMap as COBTreeMap;
+use std::collections::BTreeMap;
 
 fn compare_reads(c: &mut Criterion) {
-  let mut std_map = BTreeMap::new();
-  std_map.insert(5, "Hello");
+    let mut std_map = BTreeMap::new();
+    std_map.insert(5, "Hello");
 
-  let mut co_btree_map = COBTreeMap::new(30);
-  co_btree_map.insert(5, "Hello");
+    let mut co_btree_map = COBTreeMap::new(30);
+    co_btree_map.insert(5, "Hello");
 
-  let mut group = c.benchmark_group("Read");
+    let mut group = c.benchmark_group("Read");
 
-  group.bench_function("StaticSearchTree", |b| {
-    b.iter(|| co_btree_map.get(&5))
-  });
+    group.bench_function("StaticSearchTree", |b| b.iter(|| co_btree_map.get(&5)));
 
-  group.bench_function("BTreeMap", |b| {
-    b.iter(|| std_map.get(&5))
-  });
+    group.bench_function("BTreeMap", |b| b.iter(|| std_map.get(&5)));
 
-  group.finish()
+    group.finish()
 }
 
 fn compare_writes(c: &mut Criterion) {
-  let mut std_map = BTreeMap::new();
-  let mut co_btree_map = COBTreeMap::new(30);
+    let mut std_map = BTreeMap::new();
+    let mut co_btree_map = COBTreeMap::new(30);
 
-  let mut group = c.benchmark_group("Overwrite");
+    let mut group = c.benchmark_group("Overwrite");
 
-  group.bench_function("StaticSearchTree", |b| {
-    b.iter(|| co_btree_map.insert(5, black_box("Hello")))
-  });
+    group.bench_function("StaticSearchTree", |b| {
+        b.iter(|| co_btree_map.insert(5, black_box("Hello")))
+    });
 
-  group.bench_function("BTreeMap", |b| {
-    b.iter(|| std_map.insert(5, black_box("Hello")))
-  });
+    group.bench_function("BTreeMap", |b| {
+        b.iter(|| std_map.insert(5, black_box("Hello")))
+    });
 
-  group.finish()
+    group.finish()
 }
 
 fn compare_seqential_writes(c: &mut Criterion) {
-  let mut std_map = BTreeMap::new();
-  let mut co_btree_map = COBTreeMap::new(100);
+    let mut std_map = BTreeMap::new();
+    let mut co_btree_map = COBTreeMap::new(100);
 
-  let mut group = c.benchmark_group("Sequential Write");
+    let mut group = c.benchmark_group("Sequential Write");
 
-  group.bench_function("StaticSearchTree", |b| {
-    let mut counter = 0u8;
-    b.iter(|| {
-      counter = black_box((counter + 1) % 100);
-      co_btree_map.insert(counter, black_box("A"))
-    })
-  });
+    group.bench_function("StaticSearchTree", |b| {
+        let mut counter = 0u8;
+        b.iter(|| {
+            counter = black_box((counter + 1) % 100);
+            co_btree_map.insert(counter, black_box("A"))
+        })
+    });
 
-  group.bench_function("BTreeMap", |b| {
-    let mut counter = 0u8;
-    b.iter(|| {
-      counter = black_box((counter + 1) % 100);
-      std_map.insert(counter, black_box("A"))
-    })
-  });
+    group.bench_function("BTreeMap", |b| {
+        let mut counter = 0u8;
+        b.iter(|| {
+            counter = black_box((counter + 1) % 100);
+            std_map.insert(counter, black_box("A"))
+        })
+    });
 
-  group.finish()
+    group.finish()
 }
 
 // fn compare_uniform_random_writes(c: &mut Criterion) {
@@ -94,9 +90,9 @@ fn compare_seqential_writes(c: &mut Criterion) {
 // }
 
 criterion_group!(
-  benches,
-  compare_reads,
-  compare_writes,
-  compare_seqential_writes,
-  // compare_uniform_random_writes
+    benches,
+    compare_reads,
+    compare_writes,
+    compare_seqential_writes,
+    // compare_uniform_random_writes
 );
